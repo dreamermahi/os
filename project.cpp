@@ -1,120 +1,71 @@
 #include<stdio.h>
-#include<conio.h>
-#include<string.h>
+ 
 int main()
 {
-	char p[10][5],temp[5];
-	int a,b,pt[10],wt[10],totwt=0,pr[10],temp1,n;
-	float avgwt;
-	printf("enter the number of processes:");
-	scanf("%d",&n);
-	for(a=0;a<n;a++)
-	{
-		printf("enter the process %d name:",a+1);
-  		scanf("%s",&p[a]);
-		printf("enter the process time:");
-		scanf("%d",&pt[a]);
-		printf("enter the priority:");
-		scanf("%d",&pr[a]);
+    int bt[20],p[20],wt[20],tat[20],pri[20],i,j,n,total=0,pos,temp;
+    float avg_wt,avg_tat;
+    printf("Enter number of process:");
+    scanf("%d",&n);
+ 
+    printf("\nEnter Burst Time:\n");
+    for(i=0;i<n;i++)
+    {
+        printf("p%d:",i+1);
+        scanf("%d",&bt[i]);
+        p[i]=i+1;           //contains process number
+    }
+ 
+    //sorting burst time in ascending order using selection sort
+    for(i=0;i<n;i++)
+    {
+        pos=i;
+        for(j=i+1;j<n;j++)
+        {
+            if(bt[j]<bt[pos])
+                pos=j;
+        }
+ 
+        temp=bt[i];
+        bt[i]=bt[pos];
+        bt[pos]=temp;
+ 
+        temp=p[i];
+        p[i]=p[pos];
+        p[pos]=temp;
+    }
+ 
+    wt[0]=0;            //waiting time for first process will be zero
+ 
+    //calculate waiting time
+    for(i=1;i<n;i++)
+    {
+        wt[i]=0;
+        for(j=0;j<i;j++)
+            wt[i]+=bt[j];
+ 
+        total+=wt[i];
+    }
+ 
+    avg_wt=(float)total/n;      //average waiting time
+    total=0;
+ 	
+    printf("\nProcess\t    Burst Time    \tWaiting Time\tTurnaround Time");
+    for(i=0;i<n;i++)
+    {
+        tat[i]=bt[i]+wt[i];     //calculate turnaround time
+        total+=tat[i];
+        printf("\np%d\t\t  %d\t\t    %d\t\t\t%d",p[i],bt[i],wt[i],tat[i]);
+    }
+ 
+    avg_tat=(float)total/n;     //average turnaround time
+    printf("\n\nAverage Waiting Time=%f",avg_wt);
+    printf("\nAverage Turnaround Time=%f\n",avg_tat);
+    for(i=0;i<n;i++)
+    {
+    	pri[i]=1+(wt[i]/bt[i]);
 	}
-  	for(a=0;a<n-1;a++)
-	{
-		for(b=a+1;b<n;b++)
-		{
-			if(pr[a]>pr[b])
-			{
-				temp1=pr[a];
-				pr[a]=pr[b];
-				pr[b]=temp1;
-				temp1=pt[a];
-				pt[a]=pt[b];
-				pt[b]=temp1;
-				strcpy(temp,p[a]);
-				strcpy(p[a],p[b]);
-				strcpy(p[b],temp);
-			}
-		}
+	for(i=0;i<n;i++)
+    {
+    	printf("Priority of p%d : %d\n",i,pri[i]);
 	}
-	wt[0]=0;
-	for(a=1;a<n;a++)
-	{
-		wt[a]=wt[a-1]+wt[a-1];
-		totwt=totwt+wt[a];
-	}
-	avgwt=(float)totwt/n;
-	printf("p_name\t p_time\t priority\t w_time\n");
-	for(a=0;a<n;a++)
-	{
-	   printf(" %s\t %d\t %d\t %d\n" ,p[a],pt[a],pr[a],wt[a]);
-	}
-	printf("total waiting time=%d\n avg waiting time=%f",totwt,avgwt);
-	
-	int ts,pid[10],need[10],wt1[10],tat[10],a1,b1,n2,n1;
-	int bt[10],flag[10],ttat=0,twt=0;
-	float awt,atat;
-	printf("\nEnter the number of Processors \n");
-	scanf("%d",&n);
-	n1=n;
-	printf("\n Enter the Timeslice \n");
- 	scanf("%d",&ts);
- 	for(a=1;a<=n;a++)
-	{
-   		printf("\n Enter the process ID %d",a);
-		scanf("%d",&pid[a]);
-   		printf("\n Enter the Burst Time for the process");
-   		scanf("%d",&bt[a]);
-   		need[a]=bt[a];
- 	}
- 	for(a=1;a<=n;a++)
-	{
-		flag[a]=1;
-  		wt[a]=0;
- 	}
- 	while(n!=0)
-	{
-   		for(a=1;a<=n;a++)
-   		{
-     		if(need[a]>=ts)
-     		{
-       			for(b=1;b<=n;b++)
-				{
-	  				if((a!=b)&&(flag[a]==1)&&(need[b]!=0))
-	  				wt[b]+=ts;
-       			}
-      			need[a]-=ts;
-      			if(need[a]==0)
-      			{
-	 				flag[a]=0;
-	 				n--;
-       			}
-     		}
-     		else
-    		{
-       			for(b=1;b<=n;b++)
-       			{
-	  				if((a!=b)&&(flag[a]==1)&&(need[b]!=0))
-	  				wt[b]+=need[a];
-       			}
-       			need[a]=0;
-       			n--;
-       			flag[a]=0;
-  			}
- 		}
-	}
-	for(a=1;a<=n1;a++)
-	{
-  		tat[a]=wt[a]+bt[a];
-  		twt=twt+wt[a];
-  		ttat=ttat+tat[a];
-	}
-	awt=(float)twt/n1;
-	atat=(float)ttat/n1;
-	printf("\n\n Process \t Process ID  \t BurstTime \t Waiting Time \t TurnaroundTime \n ");
-	for(a=1;a<=n1;a++)
-	{ 
- 		printf("\n %5d \t %5d \t\t %5d \t\t %5d \t\t %5d \n", ts,pid[a],bt[a],wt[a],tat[a]);
-	}
-	printf("\n The average Waiting Time=4.2f",awt);
-	printf("\n The average Turn around Time=4.2f",atat);
 }
-
